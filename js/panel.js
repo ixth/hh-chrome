@@ -1,24 +1,25 @@
-function showComponents(components) {
-    document.querySelector('.empty-view').classList.add('hidden');
-    document.querySelector('.components-view').appendChild(buildTable(components));
-}
-
-function buildTable(components) {
-    var keys = Object.keys(components[0]);
-
-    var table = document.createElement('table');
-    table.innerHTML = buildHeader(keys) + components.map(buildRow).join('');
-
-    return table;
-
-    function buildHeader(keys) {
-        var cells = keys.map(key => `<th>${key}</th>`);
-        return `<tr>${cells.join('')}</tr>`;
+var ComponentsPanel = Marionette.View.extend({
+    className: 'components-panel',
+    template() {
+        return `<div class="components-panel__placeholder">Components</div>
+                <div class="components-panel__content"></div>`;
+    },
+    regions: {
+       content: '.components-panel__content'
+    },
+    ui: {
+        placeholder: '.components-panel__placeholder'
+    },
+    setComponents(components) {
+        if (!components.length) {
+            return;
+        }
+        this.getUI('placeholder').hide();
+        this.showChildView('content', new Table({
+            collection: new ComponentsCollection(components)
+        }));
     }
+});
 
-
-    function buildRow(component) {
-        var cells = keys.map(key => `<td>${component[key]}</td>`);
-        return `<tr>${cells.join('')}</tr>`;
-    }
-}
+var componentsPanel = new ComponentsPanel();
+componentsPanel.render().$el.appendTo(document.body);
